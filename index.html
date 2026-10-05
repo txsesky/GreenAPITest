@@ -57,20 +57,20 @@
         </div>
 
         <div class="block">
-            <button id="getSettingsBtn">getSettings</button>
-            <button id="getStateInstanceBtn">getStateInstance</button>
+            <button onclick="getSettings()">getSettings</button>
+            <button onclick="getStateInstance()">getStateInstance</button>
         </div>
 
         <div class="block">
             <input type="text" id="chatIdMessage" placeholder="chatId (напр. 77771234567)">
             <textarea id="messageText" placeholder="Текст сообщения" rows="3"></textarea>
-            <button id="sendMessageBtn">sendMessage</button>
+            <button onclick="sendMessage()">sendMessage</button>
         </div>
 
         <div class="block">
             <input type="text" id="chatIdFile" placeholder="chatId (напр. 77771234567)">
             <input type="url" id="fileUrl" placeholder="URL файла">
-            <button id="sendFileBtn">sendFileByUrl</button>
+            <button onclick="sendFileByUrl()">sendFileByUrl</button>
         </div>
 
     </div>
