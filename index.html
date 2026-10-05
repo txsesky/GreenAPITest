@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>GREEN-API Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+        }
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 50%;
+        }
+        .right-panel {
+            width: 50%;
+        }
+        .block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input, textarea, button {
+            padding: 8px;
+            font-size: 14px;
+        }
+        textarea.readonly-output {
+            width: 100%;
+            height: 95%;
+            min-height: 400px;
+            resize: none;
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="left-panel">
+        
+        <div class="block">
+            <input type="text" id="idInstance" placeholder="idInstance">
+            <input type="text" id="ApiTokenInstance" placeholder="ApiTokenInstance">
+        </div>
+
+        <div class="block">
+            <button id="getSettingsBtn">getSettings</button>
+            <button id="getStateInstanceBtn">getStateInstance</button>
+        </div>
+
+        <div class="block">
+            <input type="text" id="chatIdMessage" placeholder="chatId (напр. 77771234567)">
+            <textarea id="messageText" placeholder="Текст сообщения" rows="3"></textarea>
+            <button id="sendMessageBtn">sendMessage</button>
+        </div>
+
+        <div class="block">
+            <input type="text" id="chatIdFile" placeholder="chatId (напр. 77771234567)">
+            <input type="url" id="fileUrl" placeholder="URL файла">
+            <button id="sendFileBtn">sendFileByUrl</button>
+        </div>
+
+    </div>
+
+    <div class="right-panel">
+        <label for="responseOutput">Ответ:</label>
+        <textarea id="responseOutput" class="readonly-output" readonly></textarea>
+    </div>
+</div>
+
+<script>
+    const output = document.getElementById('responseOutput');
+
+    function getIdInstance() {
+        return document.getElementById('idInstance').value.trim();
+    }
+
+    function getToken() {
+        return document.getElementById('ApiTokenInstance').value.trim();
+    }
+
+    function getHost() {
+        return `https://7201.api.green-api.com/waInstance${getIdInstance()}`;
+    }
+
+    async function sendRequest(url, method, bodyParams = null) {
+        output.value = "Загрузка...";
+        try {
+            const options = { method: method };
+            if (bodyParams) {
+                options.headers = { 'Content-Type': 'application/json' };
+                options.body = JSON.stringify(bodyParams);
+            }
+            const response = await fetch(url, options);
+            const data = await response.json();
+            output.value = JSON.stringify(data, null, 2);
+        } catch (error) {
+            output.value = "Ошибка: " + error.message;
+        }
+    }
+
+    function getSettings() {
+        const url = `${getHost()}/getSettings/${getToken()}`;
+        sendRequest(url, 'GET');
+    }
+
+    function getStateInstance() {
+        const url = `${getHost()}/getStateInstance/${getToken()}`;
+        sendRequest(url, 'GET');
+    }
+
+    function sendMessage() {
+        const url = `${getHost()}/sendMessage/${getToken()}`;
+        const body = {
+            chatId: document.getElementById('chatIdMessage').value.trim()+'@c.us',
+            message: document.getElementById('messageText').value.trim()
+        };
+        sendRequest(url, 'POST', body);
+    }
+
+    function sendFileByUrl() {
+        const url = `${getHost()}/sendFileByUrl/${getToken()}`;
+        const fileUrl = document.getElementById('fileUrl').value.trim();
+        
+        let fileName = fileUrl.substring(fileUrl.lastIndexOf('/') + 1) || 'file.jpg';
+        fileName = fileName.split('?')[0];
+
+        const body = {
+            chatId: document.getElementById('chatIdFile').value.trim()+'@c.us',
+            urlFile: fileUrl,
+            fileName: fileName
+        };
+        sendRequest(url, 'POST', body);
+    }
+</script>
+</body>
+</html>
